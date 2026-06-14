@@ -1,7 +1,9 @@
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.post("/generate", async (req, res) => {
@@ -20,6 +22,11 @@ app.post("/generate", async (req, res) => {
       }
     );
 
+    if (!response.ok) {
+      const error = await response.text();
+      return res.status(response.status).send(error);
+    }
+
     const buffer = await response.arrayBuffer();
 
     res.set("Content-Type", "image/png");
@@ -32,4 +39,10 @@ app.post("/generate", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 3000);
+app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server running");
+});
